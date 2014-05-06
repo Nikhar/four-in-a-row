@@ -29,7 +29,7 @@
 #include <gtk/gtk.h>
 #include <canberra-gtk.h>
 
-#include "connect4.h"
+//#include "connect4.h"
 #include "main.h"
 #include "theme.h"
 #include "prefs.h"
@@ -98,6 +98,14 @@ gboolean blink_on;
 static void game_process_move (gint c);
 static void process_move2 (gint c);
 static void process_move3 (gint c);
+
+
+short
+playgame (char *input_str, struct board *board)
+{
+	return 1;
+}
+
 
 
 static void
@@ -370,7 +378,7 @@ static void
 game_init (void)
 {
   g_random_set_seed ((guint) time (NULL));
-  vboard = veleng_init ();
+//  vboard = veleng_init ();
 
   anim = ANIM_NONE;
   gameover = TRUE;
@@ -429,7 +437,7 @@ game_reset (void)
 static void
 game_free (void)
 {
-  veleng_free (vboard);
+//  veleng_free (vboard);
   gfx_free ();
 }
 

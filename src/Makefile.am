@@ -8,25 +8,12 @@ four_in_a_row_SOURCES = main.h     \
                 prefs.c    \
                 theme.c    \
                 theme.h    \
-                adjmtrx.c  \
-                bintree.c  \
-                con4vals.h \
-                connect4.h \
-                connect4.c \
-                evaluate.c \
                 games-controls.c \
                 games-controls.h \
                 games-gridframe.c \
                 games-gridframe.h \
                 games-stock.c \
                 games-stock.h \
-                heurist.h  \
-                heurist.c  \
-                ia_main.c  \
-                pbsolver.c \
-                playgame.c \
-                pnsearch.h \
-                proto.h    \
                 rules.h
 
 four_in_a_row_CPPFLAGS = \
