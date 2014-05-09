@@ -14,7 +14,8 @@ four_in_a_row_SOURCES = main.h     \
                 games-gridframe.h \
                 games-stock.c \
                 games-stock.h \
-                rules.h
+                rules.h \
+		playgame.vala
 
 four_in_a_row_CPPFLAGS = \
 	-I$(top_srcdir) \
@@ -30,5 +31,13 @@ four_in_a_row_CFLAGS = \
 four_in_a_row_LDADD = \
 	$(FOUR_IN_A_ROW_LIBS)
 	-lz
+
+four_in_a_row_VALAFLAGS = \
+	--pkg glib-2.0 \
+	--pkg gio-2.0 \
+	--pkg posix \
+	--header=playgame.h
+
+EXTRA_DIST = playgame.h
 
 -include $(top_srcdir)/git.mk

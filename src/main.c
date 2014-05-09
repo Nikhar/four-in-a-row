@@ -30,6 +30,7 @@
 #include <canberra-gtk.h>
 
 //#include "connect4.h"
+#include "playgame.h"
 #include "main.h"
 #include "theme.h"
 #include "prefs.h"
@@ -100,11 +101,6 @@ static void process_move2 (gint c);
 static void process_move3 (gint c);
 
 
-short
-playgame (char *input_str, struct board *board)
-{
-	return 1;
-}
 
 
 
@@ -428,7 +424,7 @@ game_reset (void)
     } else {
       vstr[0] = vlevel[p.level[PLAYER2]];
     }
-    game_process_move (playgame (vstr, vboard) - 1);
+    game_process_move (playgame (vstr) - 1);
   }
 }
 
@@ -640,7 +636,7 @@ on_game_hint (GSimpleAction *action, GVariant *parameter, gpointer data)
   set_status_message (_("I’m Thinking…"));
 
   vstr[0] = vlevel[LEVEL_STRONG];
-  c = playgame (vstr, vboard) - 1;
+  c = playgame (vstr) - 1;
 
   column_moveto = c;
   while (timeout)
@@ -1085,7 +1081,7 @@ process_move3 (gint c)
       } else {
 	vstr[0] = vlevel[p.level[PLAYER2]];
       }
-      c = playgame (vstr, vboard) - 1;
+      c = playgame (vstr) - 1;
       if (c < 0)
 	gameover = TRUE;
       g_timeout_add (SPEED_DROP,
