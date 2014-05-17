@@ -1,1 +1,7 @@
-int playgame(string fixme) { return 2; }
+int playgame(string fixme) 
+{
+	stdout.printf("%s\n",fixme);
+	return 2; 
+}
+
+
