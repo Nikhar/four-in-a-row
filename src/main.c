@@ -29,8 +29,7 @@
 #include <gtk/gtk.h>
 #include <canberra-gtk.h>
 
-//#include "connect4.h"
-#include "playgame.h"
+#include "ai.h"
 #include "main.h"
 #include "theme.h"
 #include "prefs.h"

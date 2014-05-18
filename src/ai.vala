@@ -10,6 +10,13 @@ const int NEG_INF = -10000;
 const int BOARD_ROWS = 7; 
 const int BOARD_COLUMNS = 7; 
 
+int playgame(string fixme)
+{
+	var t = new DecisionTree();
+	return t.playgame (fixme);
+}
+
+
 public class DecisionTree
 {
 	/* to mantain the status of the board, to be used by the heuristic function, the top left cell is 0,0 */
