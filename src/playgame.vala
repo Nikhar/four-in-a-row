@@ -1,7 +1,7 @@
 int playgame(string fixme) 
 {
-	stdout.printf("%s\n",fixme);
-	return 2; 
+	var t = new DecisionTree();
+	return t.playgame (fixme);
 }
 
 

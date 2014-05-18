@@ -15,13 +15,15 @@ four_in_a_row_SOURCES = main.h     \
                 games-stock.c \
                 games-stock.h \
                 rules.h \
-		playgame.vala
+		playgame.vala \
+		ai.vala
 
 four_in_a_row_CPPFLAGS = \
 	-I$(top_srcdir) \
 	$(AM_CPPFLAGS)
 
 four_in_a_row_CFLAGS = \
+		       $(AM_CFLAGS) \
 	-DDATA_DIRECTORY=\"$(datadir)/four-in-a-row\" \
 	-DSOUND_DIRECTORY=\"$(datadir)/four-in-a-row/sounds\" \
 	-DLOCALEDIR=\"$(datadir)/locale\" \
@@ -33,6 +35,7 @@ four_in_a_row_LDADD = \
 	-lz
 
 four_in_a_row_VALAFLAGS = \
+			  $(AM_VALAFLAGS) \
 	--pkg glib-2.0 \
 	--pkg gio-2.0 \
 	--pkg posix \
