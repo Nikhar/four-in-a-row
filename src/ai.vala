@@ -6,11 +6,15 @@
 
 
 //#define needs valac -D?
+//TODO int.MIN gives error
 const int NEG_INF = -10000; 
 const int BOARD_ROWS = 7; 
 const int BOARD_COLUMNS = 7; 
 
-int playgame(string fixme)
+enum Player { Human = -1, None, AI;}
+
+
+int playgame (string fixme)
 {
 	var t = new DecisionTree();
 	return t.playgame (fixme);
@@ -20,15 +24,15 @@ int playgame(string fixme)
 public class DecisionTree
 {
 	/* to mantain the status of the board, to be used by the heuristic function, the top left cell is 0,0 */
-	private int[,] board = new int [BOARD_ROWS, BOARD_COLUMNS]; 
+	private Player[,] board = new Player [BOARD_ROWS, BOARD_COLUMNS]; 
 	/* plies determine how deep would the tree be */
 	private int plies = 3;
 	/* determines who made the last move, AI = 1 , human = -1 */
-	private int lastMove = 0;
+	private Player lastMove = Player.None;
 	/* determines in which column will AI will make its next move based on the decision tree*/
 	private int nextMove = -1;
 
-	public DecisionTree()
+	public DecisionTree ()
 	{
 		for (int i=0; i < BOARD_ROWS; i++)
 		{
@@ -42,7 +46,7 @@ public class DecisionTree
 		}
 	}
 
-	private int negamax(int height)
+	private int negamax (int height)
 	{
 		if (height==0 || boardFull()) 
 			return -1*lastMove*heurist();
@@ -72,12 +76,12 @@ public class DecisionTree
 		return max;
 	}
 
-	private bool boardFull()
+	private bool boardFull ()
 	{
 		return board[0,0]!=0 && board[0,1]!=0 && board[0,2]!=0 && board[0,3]!=0 && board[0,4]!=0 && board[0,5]!=0 && board[0,6]!=0;
 	}
 
-	private bool move(int i)
+	private bool move (int i)
 	{
 		int cell;
 
@@ -87,21 +91,21 @@ public class DecisionTree
 			return false;
 		
 		/*if it is AI's first move or the last move was made by human */
-		if (lastMove == 0 || lastMove == -1)
+		if (lastMove == Player.None || lastMove == Player.Human)
 		{
-			board[cell,i] = 1;
-			lastMove = 1;
+			board[cell,i] = Player.AI;
+			lastMove = Player.AI;
 		}
 		else
 		{
-			board[cell,i] = -1;
-			lastMove = -1;
+			board[cell,i] = Player.Human;
+			lastMove = Player.Human;
 		}
 
 		return true;
 	}
 
-	private void unmove(int i)
+	private void unmove (int i)
 	{
 		int cell;
 
@@ -109,11 +113,13 @@ public class DecisionTree
 
 		board[cell + 1,i] = 0;
 
-		lastMove = -1 * lastMove;
+		int temp = -1 * lastMove;
+
+		lastMove = (Player)temp;
 
 	}
 
-	private void updateBoard(string vstr)
+	private void updateBoard (string vstr)
 	{
 		/*second last letter tells the latest move of human 
 		 odd length => human first move*/
@@ -125,14 +131,14 @@ public class DecisionTree
 
 		int column = vstr[vstr.length - 2] - 48;
 
-		for(cell = BOARD_ROWS - 1; cell >= 0 && board[cell,column] != 0; cell -= 1);
+		for (cell = BOARD_ROWS - 1; cell >= 0 && board[cell,column] != 0; cell -= 1);
 
-		board[cell,column] = -1;
+		board[cell,column] = Player.Human;
 
-		lastMove = -1;
+		lastMove = Player.Human;
 	}
 
-	public int playgame(string vstr)
+	public int playgame (string vstr)
 	{
 		updateBoard(vstr);
 
@@ -144,7 +150,7 @@ public class DecisionTree
 
 	}
 
-	private int heurist()
+	private int heurist ()
 	{
 
 		int temp = Random.int_range(1,49);
