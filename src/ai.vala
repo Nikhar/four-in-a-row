@@ -28,9 +28,9 @@ public class DecisionTree
 	/* plies determine how deep would the tree be */
 	private int plies = 3;
 	/* determines who made the last move, AI = 1 , human = -1 */
-	private Player lastMove = Player.None;
+	private Player last_move = Player.None;
 	/* determines in which column will AI will make its next move based on the decision tree*/
-	private int nextMove = -1;
+	private int next_move = -1;
 
 	public DecisionTree ()
 	{
@@ -48,8 +48,8 @@ public class DecisionTree
 
 	private int negamax (int height)
 	{
-		if (height==0 || boardFull()) 
-			return -1*lastMove*heurist();
+		if (height==0 || board_full()) 
+			return -1*last_move*heurist();
 
 		int max = NEG_INF; //TODO: replace NEG_INF by Vala equivalent of numeric_limits<int>::min
 
@@ -71,12 +71,12 @@ public class DecisionTree
 		}
 
 		if (height == plies) 
-			nextMove = next;
+			next_move = next;
 
 		return max;
 	}
 
-	private bool boardFull ()
+	private bool board_full ()
 	{
 		return board[0,0]!=0 && board[0,1]!=0 && board[0,2]!=0 && board[0,3]!=0 && board[0,4]!=0 && board[0,5]!=0 && board[0,6]!=0;
 	}
@@ -91,15 +91,15 @@ public class DecisionTree
 			return false;
 		
 		/*if it is AI's first move or the last move was made by human */
-		if (lastMove == Player.None || lastMove == Player.Human)
+		if (last_move == Player.None || last_move == Player.Human)
 		{
 			board[cell,i] = Player.AI;
-			lastMove = Player.AI;
+			last_move = Player.AI;
 		}
 		else
 		{
 			board[cell,i] = Player.Human;
-			lastMove = Player.Human;
+			last_move = Player.Human;
 		}
 
 		return true;
@@ -113,17 +113,17 @@ public class DecisionTree
 
 		board[cell + 1,i] = 0;
 
-		int temp = -1 * lastMove;
+		int temp = -1 * last_move;
 
-		lastMove = (Player)temp;
+		last_move = (Player)temp;
 
 	}
 
-	private void updateBoard (string vstr)
+	private void update_board (string vstr)
 	{
 		/*second last letter tells the latest move of human 
 		 odd length => human first move*/
-		nextMove = -1;
+		next_move = -1;
 
 		if (vstr.length == 2) return; // AI will make the first move, nothing to add to the board
 
@@ -135,18 +135,18 @@ public class DecisionTree
 
 		board[cell,column] = Player.Human;
 
-		lastMove = Player.Human;
+		last_move = Player.Human;
 	}
 
 	public int playgame (string vstr)
 	{
-		updateBoard(vstr);
+		update_board(vstr);
 
 		negamax(plies);
 
-		move(nextMove);
+		move(next_move);
 
-		return nextMove;
+		return next_move;
 
 	}
 
