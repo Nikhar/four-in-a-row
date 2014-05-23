@@ -27,7 +27,7 @@ public class DecisionTree
 	/* to mantain the status of the board, to be used by the heuristic function, the top left cell is 0,0 */
 	private static Player[,] board = new Player [BOARD_ROWS, BOARD_COLUMNS]; 
 	/* plies determine how deep would the tree be */
-	private int plies = 3;
+	private int plies = 4;
 	/* determines who made the last move, AI = 1 , human = -1 */
 	private Player last_move = Player.None;
 	/* determines in which column will AI will make its next move based on the decision tree*/
@@ -93,21 +93,64 @@ public class DecisionTree
 		int cell;
 		/* board[cell,i] now is the cell on which the last move was made */
 		for (cell = BOARD_ROWS - 1; cell >= 0 && board[cell,i] != 0; cell -= 1);
+		cell = cell + 1;
 
 		int temp = 0;
 
 		/*check vertically for the win */
-		cell = cell + 1;
-
 		temp = vertical_win(cell,i);
 		if (temp != 0) return temp;
 
 		/* check horizontally for the win*/
-	//	temp = horizontal_win(cell,i);
-	//	if (temp != 0) return temp;
-		
+		temp = horizontal_win(cell,i);
+		if (temp != 0) return temp;
+
+		temp = backward_diagonal_win(cell,i);
+		if (temp != 0) return temp;
+	
+		temp = forward_diagonal_win(cell,i);
 		return temp;
 
+	}
+
+
+	private int forward_diagonal_win (int i, int j)
+	{
+		int count = 0;
+
+		for (int k = i, l = j; k >= 0 && l < BOARD_COLUMNS && board[k,l] == last_move; k--, l++, count++);
+		for (int k = i + 1, l = j - 1; k < BOARD_ROWS && l >= 0 && board[k,l] == last_move; k++, l--, count++);
+
+		if (count >= 4)
+			return last_move * POS_INF;
+
+		return 0;
+	}
+
+	private int backward_diagonal_win (int i, int j)
+	{
+		int count = 0;
+
+		for (int k = i, l = j; k >= 0 && l >= 0 && board[k,l] == last_move; k--, l--, count++);
+		for (int k = i + 1, l = j + 1; k < BOARD_ROWS && l < BOARD_COLUMNS && board[k,l] == last_move; k++, l++, count++);
+
+		if (count >= 4)
+			return last_move * POS_INF;
+
+		return 0;
+	}
+
+	private int horizontal_win (int i, int j)
+	{
+		int count = 0;
+
+		for (int k = j; k >= 0 && board[i,k] == last_move; k--, count++);
+		for (int k = j+1; k < BOARD_COLUMNS && board[i,k] == last_move; k++, count++);
+
+		if (count >= 4)
+			return last_move * POS_INF;
+
+		return 0;
 	}
 
 	private int vertical_win (int i, int j)
