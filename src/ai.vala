@@ -8,6 +8,7 @@
 //#define needs valac -D?
 //TODO int.MIN gives error
 const int NEG_INF = -10000; 
+const int POS_INF = 10000;
 const int BOARD_ROWS = 7; 
 const int BOARD_COLUMNS = 7; 
 
@@ -24,7 +25,7 @@ int playgame (string fixme)
 public class DecisionTree
 {
 	/* to mantain the status of the board, to be used by the heuristic function, the top left cell is 0,0 */
-	private Player[,] board = new Player [BOARD_ROWS, BOARD_COLUMNS]; 
+	private static Player[,] board = new Player [BOARD_ROWS, BOARD_COLUMNS]; 
 	/* plies determine how deep would the tree be */
 	private int plies = 3;
 	/* determines who made the last move, AI = 1 , human = -1 */
@@ -34,16 +35,17 @@ public class DecisionTree
 
 	public DecisionTree ()
 	{
-		for (int i=0; i < BOARD_ROWS; i++)
+		//TODO: on game reload need to reinitialize to zero
+	/*	for (int i=0; i < BOARD_ROWS; i++)
 		{
 			for (int j=0; j < BOARD_COLUMNS; j++)
-			{
+			{*/
 				/* 0 implies the cell is empty
 				 -1 implies human has moved and 1 implies AI has moved
 				 this choice used because we wish to maximize AI's score*/
-				board[i,j]=0;
+			/*	board[i,j]=0;
 			}
-		}
+		}*/
 	}
 
 	private int negamax (int height)
@@ -60,7 +62,15 @@ public class DecisionTree
 			/* make a move into the i'th column*/
 			if (move(i)) 
 			{
-				int temp = -1 * negamax(height - 1);
+				/* is_victor is similar to heurist => is_victor ~ heurist
+				   temp = -1 * negamax
+				   negamax = -1 * last_move * heurist
+				   temp = last_move * is_victor*/
+				int temp = last_move * is_victor(i);
+
+				if (temp == 0)
+					temp = -1 * negamax(height - 1);
+
 				if (temp >= max)
 				{
 					next = i;
@@ -74,6 +84,75 @@ public class DecisionTree
 			next_move = next;
 
 		return max;
+	}
+
+	/* returns POS_INF if AI has won as a result of the last move made, NEG_INF if Human has won, 0 if no one has won the game yet 
+	   The argument i is the column in which the last move was made. */
+	private int is_victor (int i)
+	{
+		int cell;
+		/* board[cell,i] now is the cell on which the last move was made */
+		for (cell = BOARD_ROWS - 1; cell >= 0 && board[cell,i] != 0; cell -= 1);
+
+		int temp = 0;
+
+		/*check vertically for the win */
+		cell = cell + 1;
+
+		temp = vertical_win(cell,i);
+		if (temp != 0) return temp;
+
+		/* check horizontally for the win*/
+	//	temp = horizontal_win(cell,i);
+	//	if (temp != 0) return temp;
+		
+		return temp;
+
+	}
+
+	private int vertical_win (int i, int j)
+	{
+	//	if (i < 3) return 0;
+		
+
+//		stdout.printf("!@!@!@%d\t%d\n",i,j);
+		int count = 0;
+
+	//	stdout.printf("%d\t%d\n",board[i,j],last_move);
+
+		for (int l=0;l<BOARD_ROWS;l++)
+		{
+			for(int m = 0; m< BOARD_COLUMNS; m++)
+			{
+				stdout.printf("%d\t",board[l,m]);
+			}
+			stdout.printf("\n");
+		}
+		stdout.printf("\n");
+
+		stdout.printf("board[%d,%d]=%d\n",i,j,board[i,j]);
+
+		for (int k = i; k < BOARD_ROWS && board[k,j] == last_move; k++ , count++)
+		{
+			stdout.printf("Count: %d\n",count);
+		};
+
+		if (count >= 4) 
+		{
+			stdout.printf("vertical_win!!!\n");
+			for(int k=0;k<7;k++)
+			{
+				for(int l=0;l<7;l++)
+				{
+					stdout.printf("%d\t",board[k,l]);
+				}
+				stdout.printf("\n");
+			}
+			stdout.printf("\n");
+			return last_move * POS_INF;
+		}
+
+		return 0;
 	}
 
 	private bool board_full ()
@@ -129,7 +208,7 @@ public class DecisionTree
 
 		int cell;
 
-		int column = vstr[vstr.length - 2] - 48;
+		int column = int.parse(vstr[vstr.length - 2].to_string()) -1;
 
 		for (cell = BOARD_ROWS - 1; cell >= 0 && board[cell,column] != 0; cell -= 1);
 
@@ -146,7 +225,8 @@ public class DecisionTree
 
 		move(next_move);
 
-		return next_move;
+		//old c code begins indexing from 1
+		return next_move + 1;
 
 	}
 
