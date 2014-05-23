@@ -1,14 +1,8 @@
-/*int playgame(string fixme) 
-  {
-  stdout.printf("%s\n",fixme);
-  return 2; 
-  }*/
-
-
 //#define needs valac -D?
 //TODO int.MIN gives error
 const int NEG_INF = -10000; 
 const int POS_INF = 10000;
+// TODO I don't think it's a 7*7 board, it seems more like 6 * 7 board
 const int BOARD_ROWS = 7; 
 const int BOARD_COLUMNS = 7; 
 
@@ -62,13 +56,18 @@ public class DecisionTree
 			/* make a move into the i'th column*/
 			if (move(i)) 
 			{
+				/* We check if making a move in this column results in a victory for someone*/
+
 				/* is_victor is similar to heurist => is_victor ~ heurist
 				   temp = -1 * negamax
 				   negamax = -1 * last_move * heurist
 				   temp = last_move * is_victor*/
+
 				/* Add a height factor to avoid closer threats first */
 				int temp = last_move * is_victor(i) * height;
 
+				/* if making a move in this column resulted in a victory for someone, temp!=0, we do not need to go
+				   further down the negamax tree*/
 				if (temp == 0)
 					temp = -1 * negamax(height - 1);
 
@@ -92,17 +91,15 @@ public class DecisionTree
 	private int is_victor (int i)
 	{
 		int cell;
-		/* board[cell,i] now is the cell on which the last move was made */
+		/* board[cell,i] would now be the cell on which the last move was made */
 		for (cell = BOARD_ROWS - 1; cell >= 0 && board[cell,i] != 0; cell -= 1);
 		cell = cell + 1;
 
 		int temp = 0;
 
-		/*check vertically for the win */
 		temp = vertical_win(cell,i);
 		if (temp != 0) return temp;
 
-		/* check horizontally for the win*/
 		temp = horizontal_win(cell,i);
 		if (temp != 0) return temp;
 
@@ -114,7 +111,7 @@ public class DecisionTree
 
 	}
 
-
+	/* all the win functions that follow return 0 is no one wins, POS_INF if AI wins, -1 * POS_INF if human wins */
 	private int forward_diagonal_win (int i, int j)
 	{
 		int count = 0;
@@ -156,45 +153,12 @@ public class DecisionTree
 
 	private int vertical_win (int i, int j)
 	{
-	//	if (i < 3) return 0;
-		
-
-//		stdout.printf("!@!@!@%d\t%d\n",i,j);
 		int count = 0;
 
-	//	stdout.printf("%d\t%d\n",board[i,j],last_move);
-
-		for (int l=0;l<BOARD_ROWS;l++)
-		{
-			for(int m = 0; m< BOARD_COLUMNS; m++)
-			{
-				stdout.printf("%d\t",board[l,m]);
-			}
-			stdout.printf("\n");
-		}
-		stdout.printf("\n");
-
-		stdout.printf("board[%d,%d]=%d\n",i,j,board[i,j]);
-
-		for (int k = i; k < BOARD_ROWS && board[k,j] == last_move; k++ , count++)
-		{
-			stdout.printf("Count: %d\n",count);
-		};
+		for (int k = i; k < BOARD_ROWS && board[k,j] == last_move; k++ , count++);
 
 		if (count >= 4) 
-		{
-			stdout.printf("vertical_win!!!\n");
-			for(int k=0;k<7;k++)
-			{
-				for(int l=0;l<7;l++)
-				{
-					stdout.printf("%d\t",board[k,l]);
-				}
-				stdout.printf("\n");
-			}
-			stdout.printf("\n");
 			return last_move * POS_INF;
-		}
 
 		return 0;
 	}
