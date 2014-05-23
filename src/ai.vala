@@ -66,7 +66,8 @@ public class DecisionTree
 				   temp = -1 * negamax
 				   negamax = -1 * last_move * heurist
 				   temp = last_move * is_victor*/
-				int temp = last_move * is_victor(i);
+				/* Add a height factor to avoid closer threats first */
+				int temp = last_move * is_victor(i) * height;
 
 				if (temp == 0)
 					temp = -1 * negamax(height - 1);
