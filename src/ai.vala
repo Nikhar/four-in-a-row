@@ -1,6 +1,6 @@
 //#define needs valac -D?
 //TODO int.MIN gives error
-const int NEG_INF = -10000; 
+const int NEG_INF = -100000; 
 const int POS_INF = 10000;
 // TODO I don't think it's a 7*7 board, it seems more like 6 * 7 board
 const int BOARD_ROWS = 7; 
@@ -15,13 +15,18 @@ int playgame (string fixme)
 	return t.playgame (fixme);
 }
 
+void board_reset ()
+{
+	DecisionTree.board_reset();
+//	DecisionTree.print_board();
+}
 
 public class DecisionTree
 {
 	/* to mantain the status of the board, to be used by the heuristic function, the top left cell is 0,0 */
 	private static Player[,] board = new Player [BOARD_ROWS, BOARD_COLUMNS]; 
 	/* plies determine how deep would the tree be */
-	private int plies = 4;
+	private int plies = 5;
 	/* determines who made the last move, AI = 1 , human = -1 */
 	private Player last_move = Player.None;
 	/* determines in which column will AI will make its next move based on the decision tree*/
@@ -29,7 +34,7 @@ public class DecisionTree
 
 	public DecisionTree ()
 	{
-		//TODO: on game reload need to reinitialize to zero
+		//TODO: properly initialize on first construction
 	/*	for (int i=0; i < BOARD_ROWS; i++)
 		{
 			for (int j=0; j < BOARD_COLUMNS; j++)
@@ -40,6 +45,35 @@ public class DecisionTree
 			/*	board[i,j]=0;
 			}
 		}*/
+	}
+
+	public static void board_reset()
+	{
+		for (int i=0; i < BOARD_ROWS; i++)
+		{
+			for (int j=0; j < BOARD_COLUMNS; j++)
+			{
+				/* 0 implies the cell is empty
+				 -1 implies human has moved and 1 implies AI has moved
+				 this choice used because we wish to maximize AI's score*/
+				board[i,j] = Player.None;
+			}
+		}
+
+	}
+
+	/* utility function for debugging purposes*/
+	public static void print_board ()
+	{
+		for (int i=0; i< BOARD_ROWS; i++)
+		{
+			for (int j = 0; j < BOARD_COLUMNS; j++)
+			{
+				stdout.printf("%d\t",board[i,j]);
+			}
+			stdout.printf("\n");
+		}
+		stdout.printf("\n");
 	}
 
 	private int negamax (int height)
@@ -223,6 +257,8 @@ public class DecisionTree
 		board[cell,column] = Player.Human;
 
 		last_move = Player.Human;
+
+		//print_board();
 	}
 
 	public int playgame (string vstr)

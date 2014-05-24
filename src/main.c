@@ -564,6 +564,7 @@ static void
 on_game_new (GSimpleAction *action, GVariant *parameter, gpointer data)
 {
   stop_anim ();
+  board_reset();
   game_reset ();
 }
 
