@@ -1,3 +1,5 @@
+/* -*- Mode: vala; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*- */
+
 //#define needs valac -D?
 //TODO int.MIN gives error
 const int NEG_INF = -100000;
