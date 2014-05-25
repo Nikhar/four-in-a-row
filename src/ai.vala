@@ -1,6 +1,6 @@
 //#define needs valac -D?
 //TODO int.MIN gives error
-const int NEG_INF = -100000; 
+const int NEG_INF = -100000;
 const int POS_INF = 10000;
 // TODO I don't think it's a 7*7 board, it seems more like 6 * 7 board
 const int BOARD_ROWS = 7; 
@@ -11,14 +11,14 @@ enum Player { Human = -1, None, AI;}
 
 int playgame (string fixme)
 {
-	var t = new DecisionTree();
+	var t = new DecisionTree ();
 	return t.playgame (fixme);
 }
 
 void board_reset ()
 {
-	DecisionTree.board_reset();
-//	DecisionTree.print_board();
+	DecisionTree.board_reset ();
+//	DecisionTree.print_board ();
 }
 
 public class DecisionTree
@@ -47,7 +47,7 @@ public class DecisionTree
 		}*/
 	}
 
-	public static void board_reset()
+	public static void board_reset ()
 	{
 		for (int i=0; i < BOARD_ROWS; i++)
 		{
@@ -69,17 +69,17 @@ public class DecisionTree
 		{
 			for (int j = 0; j < BOARD_COLUMNS; j++)
 			{
-				stdout.printf("%d\t",board[i,j]);
+				stdout.printf ("%d\t",board[i,j]);
 			}
-			stdout.printf("\n");
+			stdout.printf ("\n");
 		}
-		stdout.printf("\n");
+		stdout.printf ("\n");
 	}
 
 	private int negamax (int height)
 	{
-		if (height==0 || board_full()) 
-			return -1*last_move*heurist();
+		if (height==0 || board_full ())
+			return -1*last_move*heurist ();
 
 		int max = NEG_INF; //TODO: replace NEG_INF by Vala equivalent of numeric_limits<int>::min
 
@@ -88,7 +88,7 @@ public class DecisionTree
 		for (int i=0; i < BOARD_ROWS; i++)
 		{
 			/* make a move into the i'th column*/
-			if (move(i)) 
+			if (move (i))
 			{
 				/* We check if making a move in this column results in a victory for someone*/
 
@@ -98,19 +98,19 @@ public class DecisionTree
 				   temp = last_move * is_victor*/
 
 				/* Add a height factor to avoid closer threats first */
-				int temp = last_move * is_victor(i) * height;
+				int temp = last_move * is_victor (i) * height;
 
 				/* if making a move in this column resulted in a victory for someone, temp!=0, we do not need to go
 				   further down the negamax tree*/
 				if (temp == 0)
-					temp = -1 * negamax(height - 1);
+					temp = -1 * negamax (height - 1);
 
 				if (temp >= max)
 				{
 					next = i;
 					max = temp;
 				}
-				unmove(i);
+				unmove (i);
 			}
 		}
 
@@ -131,16 +131,16 @@ public class DecisionTree
 
 		int temp = 0;
 
-		temp = vertical_win(cell,i);
+		temp = vertical_win (cell,i);
 		if (temp != 0) return temp;
 
-		temp = horizontal_win(cell,i);
+		temp = horizontal_win (cell,i);
 		if (temp != 0) return temp;
 
-		temp = backward_diagonal_win(cell,i);
+		temp = backward_diagonal_win (cell,i);
 		if (temp != 0) return temp;
 	
-		temp = forward_diagonal_win(cell,i);
+		temp = forward_diagonal_win (cell,i);
 		return temp;
 
 	}
@@ -263,11 +263,11 @@ public class DecisionTree
 
 	public int playgame (string vstr)
 	{
-		update_board(vstr);
+		update_board (vstr);
 
-		negamax(plies);
+		negamax (plies);
 
-		move(next_move);
+		move (next_move);
 
 		//old c code begins indexing from 1
 		return next_move + 1;
@@ -277,7 +277,7 @@ public class DecisionTree
 	private int heurist ()
 	{
 
-		int temp = Random.int_range(1,49);
+		int temp = Random.int_range (1,49);
 		return temp;
 	}
 }
