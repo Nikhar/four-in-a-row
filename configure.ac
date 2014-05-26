@@ -30,6 +30,11 @@ PKG_CHECK_MODULES(FOUR_IN_A_ROW, [
 AC_PATH_PROG([APPDATA_VALIDATE], [appdata-validate], [/bin/true])
 AC_PATH_PROG([DESKTOP_FILE_VALIDATE], [desktop-file-validate], [/bin/true])
 
+AC_PATH_PROG([GTESTER], [gtester])
+if ! test -x "${GTESTER}" ; then
+  AC_MSG_ERROR([Please install gtester])
+fi
+
 dnl ###########################################################################
 dnl Internationalization
 dnl ###########################################################################

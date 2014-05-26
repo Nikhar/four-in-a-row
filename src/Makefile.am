@@ -1,5 +1,7 @@
 bin_PROGRAMS = four-in-a-row
 
+check_PROGRAMS = ai-test
+
 four_in_a_row_SOURCES = main.h     \
                 main.c     \
                 gfx.h      \
@@ -44,6 +46,19 @@ $(ai_HEADER): $(ai_VALA)
 		--header=ai.h --pkg glib-2.0 --pkg gio-2.0 --pkg posix --use-header $^
 
 $(ai_C) : $(ai_HEADER)
+
+ai_test_SOURCES = \
+	ai.vala \
+	test-ai.vala
+
+ai_test_CPPFLAGS = \
+	$(FOUR_IN_A_ROW_CFLAGS)
+
+ai_test_LDADD = \
+	$(FOUR_IN_A_ROW_LIBS)
+
+check-local: $(check_PROGRAMS)
+	$(GTESTER) --keep-going --verbose $(check_PROGRAMS)
 
 BUILT_SOURCES = \
 	$(ai_C) \
