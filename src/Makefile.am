@@ -40,8 +40,8 @@ ai_HEADER = ai.h
 ai_C = $(ai_VALA:.vala=.c)
 
 $(ai_HEADER): $(ai_VALA)
-	$(V_VALAC) $(VALAC) $(AM_VALAFLAGS) -C --basedir=$(srcdir) --directory=$(builddir) \
-		--header=ai.h --pkg glib-2.0 --pkg gio-2.0 --pkg posix --use-header $^
+	$(V_VALAC) $(VALAC) -C --basedir=$(srcdir) --directory=$(builddir) --header=ai.h \
+		--pkg glib-2.0 --pkg gio-2.0 --pkg posix --use-header $(VALAFLAGS) $^
 
 $(ai_C) : $(ai_HEADER)
 
