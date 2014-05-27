@@ -19,15 +19,13 @@ four_in_a_row_SOURCES = main.h     \
                 $(ai_HEADER)
 
 four_in_a_row_CPPFLAGS = \
-	-I$(top_srcdir) \
-	$(AM_CPPFLAGS)
+	-I$(top_srcdir)
 
 four_in_a_row_CFLAGS = \
 	-DDATA_DIRECTORY=\"$(datadir)/four-in-a-row\" \
 	-DSOUND_DIRECTORY=\"$(datadir)/four-in-a-row/sounds\" \
 	-DLOCALEDIR=\"$(datadir)/locale\" \
 	-DICON_THEME_DIRECTORY="\"$(datadir)/icons\"" \
-	$(AM_CFLAGS) \
 	$(FOUR_IN_A_ROW_CFLAGS)
 
 four_in_a_row_LDADD = \
@@ -40,8 +38,8 @@ ai_HEADER = ai.h
 ai_C = $(ai_VALA:.vala=.c)
 
 $(ai_HEADER): $(ai_VALA)
-	$(V_VALAC) $(VALAC) $(AM_VALAFLAGS) -C --basedir=$(srcdir) --directory=$(builddir) \
-		--header=ai.h --pkg glib-2.0 --pkg gio-2.0 --pkg posix --use-header $^
+	$(V_VALAC) $(VALAC) -C --basedir=$(srcdir) --directory=$(builddir) --header=ai.h \
+		--pkg glib-2.0 --pkg gio-2.0 --pkg posix --use-header $(VALAFLAGS) $^
 
 $(ai_C) : $(ai_HEADER)
 
