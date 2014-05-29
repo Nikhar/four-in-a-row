@@ -111,21 +111,18 @@ public class DecisionTree
 					temp = -1 * is_victor(i) * height;
 				else
 					temp = is_victor(i) * height;
-				stdout.printf("Value of temp after is_victor: %d\n",temp);
 //				int temp = last_move * is_victor(i) * height;
 
 				/* if making a move in this column resulted in a victory for someone, temp!=0, we do not need to go
 				   further down the negamax tree*/
 				if (temp == 0)
 					temp = -1 * negamax(height - 1);
-				stdout.printf("Value of temp after negamax call: %d\n",temp);
 
 				if (temp >= max)
 				{
 					next = i;
 					max = temp;
 				}
-				stdout.printf("Value of max after negamax call: %d\n",max);
 				unmove(i);
 			}
 		}
@@ -133,8 +130,6 @@ public class DecisionTree
 		if (height == plies) 
 			next_move = next;
 
-		stdout.printf("The value being returned is %d\n", max);
-		stdout.printf("The value of next_move is %d\n", next_move);
 
 		return max;
 	}
@@ -279,8 +274,7 @@ public class DecisionTree
 			last_move = Player.HUMAN;
 		}
 
-		stdout.printf("Moving to %d,%d\n",cell,i);
-		print_board();
+	//	print_board();
 
 		return true;
 	}
@@ -322,7 +316,6 @@ public class DecisionTree
 		board[cell,column] = Player.HUMAN;
 
 		last_move = Player.HUMAN;*/
-		stdout.printf("%s\n",vstr);
 
 		next_move = -1;
 
@@ -352,7 +345,7 @@ public class DecisionTree
 		}
 
 		last_move = Player.HUMAN;
-		print_board();
+		//print_board();
 	}
 
 	/* check for immediate win of AI/HUMAN */
@@ -413,7 +406,6 @@ public class DecisionTree
 	{
 
 		int temp = Random.int_range(1,49);
-		stdout.printf("heurist returns %d\n",temp);
 		return temp;
 	}
 }
