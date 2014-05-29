@@ -111,24 +111,30 @@ public class DecisionTree
 					temp = -1 * is_victor(i) * height;
 				else
 					temp = is_victor(i) * height;
+				stdout.printf("Value of temp after is_victor: %d\n",temp);
 //				int temp = last_move * is_victor(i) * height;
 
 				/* if making a move in this column resulted in a victory for someone, temp!=0, we do not need to go
 				   further down the negamax tree*/
 				if (temp == 0)
 					temp = -1 * negamax(height - 1);
+				stdout.printf("Value of temp after negamax call: %d\n",temp);
 
 				if (temp >= max)
 				{
 					next = i;
 					max = temp;
 				}
+				stdout.printf("Value of max after negamax call: %d\n",max);
 				unmove(i);
 			}
 		}
 
 		if (height == plies) 
 			next_move = next;
+
+		stdout.printf("The value being returned is %d\n", max);
+		stdout.printf("The value of next_move is %d\n", next_move);
 
 		return max;
 	}
@@ -258,7 +264,7 @@ public class DecisionTree
 
 		for(cell = BOARD_ROWS - 1; cell >= 0 && board[cell,i] != Player.NONE; cell -= 1);
 
-		if(cell <= 0)
+		if(cell < 0)
 			return false;
 		
 		/*if it is AI's first move or the last move was made by human */
@@ -272,6 +278,9 @@ public class DecisionTree
 			board[cell,i] = Player.HUMAN;
 			last_move = Player.HUMAN;
 		}
+
+		stdout.printf("Moving to %d,%d\n",cell,i);
+		print_board();
 
 		return true;
 	}
@@ -313,6 +322,7 @@ public class DecisionTree
 		board[cell,column] = Player.HUMAN;
 
 		last_move = Player.HUMAN;*/
+		stdout.printf("%s\n",vstr);
 
 		next_move = -1;
 
@@ -345,9 +355,50 @@ public class DecisionTree
 		print_board();
 	}
 
+	/* check for immediate win of AI/HUMAN */
+	private int immediate_win (Player p)
+	{
+		Player old_last_moved = last_move;
+
+		if (p == Player.AI)
+			last_move = Player.HUMAN;
+		else
+			last_move = Player.AI;
+
+		for (int i = 0; i < BOARD_COLUMNS; i++)
+		{
+			if (move(i))
+			{
+				if (is_victor(i) != 0) 
+				{
+					unmove(i);
+					last_move = old_last_moved;
+					return i;
+				}	
+
+				unmove(i);
+			}
+		}
+
+		last_move = old_last_moved;
+
+		/* returns -1 if no immediate win for Player p*/
+		return -1;
+	}
+
 	public int playgame (string vstr)
 	{
 		update_board(vstr);
+
+		int temp = immediate_win (Player.AI);
+
+		if (temp != -1) 
+			return temp + 1;
+
+		temp = immediate_win (Player.HUMAN);
+
+		if (temp != -1) 
+			return temp + 1;
 
 		negamax(plies);
 
@@ -362,6 +413,7 @@ public class DecisionTree
 	{
 
 		int temp = Random.int_range(1,49);
+		stdout.printf("heurist returns %d\n",temp);
 		return temp;
 	}
 }
