@@ -1,11 +1,15 @@
 //#define needs valac -D?
 //TODO int.MIN gives error
+//TODO Correct names for following constants
+//Here NEG_INF is supposed to be the lowest possible number
+//Here POS_INF is supposed to be the heurist return value when AI wins
+//POS_INF < NEG_INF/plies
 const int NEG_INF = -100000; 
 const int POS_INF = 10000;
 // TODO I don't think it's a 7*7 board, it seems more like 6 * 7 board
 const int BOARD_ROWS = 6; 
 const int BOARD_COLUMNS = 7; 
-
+const bool DEBUG = false;
 enum Player { NONE, HUMAN, AI;}
 
 
@@ -26,7 +30,7 @@ public class DecisionTree
 	/* to mantain the status of the board, to be used by the heuristic function, the top left cell is 0,0 */
 	private Player[,] board = new Player [BOARD_ROWS, BOARD_COLUMNS]; 
 	/* plies determine how deep would the tree be */
-	private int plies = 5;
+	private int plies = 7;
 	/* determines who made the last move, AI = 1 , human = -1 */
 	private Player last_move = Player.NONE;
 	/* determines in which column will AI will make its next move based on the decision tree*/
@@ -76,8 +80,11 @@ public class DecisionTree
 		stdout.printf("\n");
 	}
 
-	private int negamax (int height)
+	private int negamax (int height, int alpha, int beta)
 	{
+
+		if (DEBUG) 
+			stdout.printf("The value of alpha, beta on entering height %d is %d,%d: \n",height,alpha,beta);
 		if (height==0 || board_full()) 
 		{
 			if (last_move == Player.HUMAN)
@@ -116,20 +123,42 @@ public class DecisionTree
 				/* if making a move in this column resulted in a victory for someone, temp!=0, we do not need to go
 				   further down the negamax tree*/
 				if (temp == 0)
-					temp = -1 * negamax(height - 1);
+					temp = -1 * negamax(height - 1, -1 * beta, -1 * alpha);
 
-				if (temp >= max)
+				unmove(i);
+
+				if (temp > max)
 				{
 					next = i;
 					max = temp;
 				}
-				unmove(i);
+				
+
+				if (temp > alpha)
+				{
+					alpha = temp;
+					if (DEBUG) 
+						stdout.printf("The value of alpha at height %d changes to %d\n",height,alpha);
+					if (DEBUG) 
+						stdout.printf("The value of alpha, beta after change at height %d is %d,%d: \n",height,alpha,beta);
+				}
+
+
+				if (alpha >= beta)
+				{
+					if (DEBUG) 
+						stdout.printf("breaking\n");
+					break;
+				}
+
 			}
 		}
 
 		if (height == plies) 
 			next_move = next;
 
+		if (DEBUG) 
+		stdout.printf("The value of alpha, beta on leaving height %d is %d,%d: \n",height,alpha,beta);
 
 		return max;
 	}
@@ -393,7 +422,7 @@ public class DecisionTree
 		if (temp != -1) 
 			return temp + 1;
 
-		negamax(plies);
+		negamax(plies,  NEG_INF, -1 * NEG_INF);
 
 		move(next_move);
 
@@ -405,8 +434,46 @@ public class DecisionTree
 	private int heurist ()
 	{
 
-		int temp = Random.int_range(1,49);
-		return temp;
+		int count = 0;
+		count = count_3_in_a_row(Player.AI);
+		count -= count_3_in_a_row(Player.HUMAN);
+		count=count*100;
+		if (count == 0)
+			count = Random.int_range(1,49);
+		
+		//stdout.printf("%d\n",count);	
+		if (DEBUG) 
+		stdout.printf("Heurist returns: %d\n",count);	
+		return count;
+	}
+
+	/* count = +1 for each AI 3 in a row and -1 for each HUMAN 3 in a row */
+	private int count_3_in_a_row(Player p)
+	{
+		int count = 0;
+
+		Player old_last_move = last_move;
+
+		last_move = p;
+
+		for (int j = 0; j < BOARD_COLUMNS; j++)
+		{
+			for (int i = 0; i < BOARD_ROWS; i++)
+			{
+				if(board[i,j] != Player.NONE)
+					break;
+
+				board[i,j] = p;
+
+				if(is_victor(j)!=0)
+					count++;
+
+				board[i,j] = Player.NONE;
+						
+			}
+		}
+		last_move = old_last_move;
+		return count;
 	}
 }
 
