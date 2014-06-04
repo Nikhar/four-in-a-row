@@ -329,7 +329,7 @@ public class DecisionTree
 
 	}
 
-	private void update_board (string vstr)
+	public void update_board (string vstr)
 	{
 		/*second last letter tells the latest move of human 
 		 odd length => human first move*/
@@ -541,13 +541,41 @@ public class DecisionTree
 		else if (vstr[0] == 'b')
 		{
 			level = Difficulty.MEDIUM;
-			plies = 10;
+			plies = 8;
 		}
 		else
 		{
 			level = Difficulty.HARD;
 			plies = 8;
 		}
+	}
+
+
+	public int playandcheck (string vstr)
+	{
+		set_level(vstr);
+
+		update_board(vstr);
+
+		int temp = immediate_win (Player.AI);
+
+		if (temp != -1) 
+		{
+			return 1000;
+		}
+
+		temp = immediate_win (Player.HUMAN);
+
+		if (temp != -1) 
+			return temp + 1;
+
+		negamax(plies,  NEG_INF, -1 * NEG_INF);
+
+	//	move(next_move);
+
+		//old c code begins indexing from 1
+		return next_move + 1;
+
 	}
 }
 
