@@ -11,7 +11,7 @@ const int BOARD_ROWS = 6;
 const int BOARD_COLUMNS = 7; 
 const bool DEBUG = false;
 enum Player { NONE, HUMAN, AI;}
-
+enum Difficulty {EASY, MEDIUM, HARD;}
 
 int playgame (string fixme)
 {
@@ -30,11 +30,13 @@ public class DecisionTree
 	/* to mantain the status of the board, to be used by the heuristic function, the top left cell is 0,0 */
 	private Player[,] board = new Player [BOARD_ROWS, BOARD_COLUMNS]; 
 	/* plies determine how deep would the tree be */
-	private int plies = 7;
+	private int plies = 8;
 	/* determines who made the last move, AI = 1 , human = -1 */
 	private Player last_move = Player.NONE;
 	/* determines in which column will AI will make its next move based on the decision tree*/
 	private int next_move = -1;
+	/* stores the difficulty level of the game*/
+	private Difficulty level;
 
 	public DecisionTree ()
 	{
@@ -410,6 +412,8 @@ public class DecisionTree
 
 	public int playgame (string vstr)
 	{
+		set_level(vstr);
+
 		update_board(vstr);
 
 		int temp = immediate_win (Player.AI);
@@ -433,22 +437,48 @@ public class DecisionTree
 
 	private int heurist ()
 	{
+		if (level == Difficulty.EASY)
+			return heurist_easy();
 
+		else if (level == Difficulty.MEDIUM)
+			return heurist_medium();
+
+		else
+			return heurist_hard();
+		
+	}
+
+	private int heurist_easy()
+	{
+		return -1 * heurist_hard();
+	}
+
+	private int heurist_medium()
+	{
+		return Random.int_range(1,49);
+	}
+
+	private int heurist_hard()
+	{
 		int count = 0;
+
 		count = count_3_in_a_row(Player.AI);
+
 		count -= count_3_in_a_row(Player.HUMAN);
-		count=count*100;
+
+		count = count*100;
+
 		if (count == 0)
 			count = Random.int_range(1,49);
 		
 		//stdout.printf("%d\n",count);	
 		if (DEBUG) 
-		stdout.printf("Heurist returns: %d\n",count);	
+			stdout.printf("Heurist returns: %d\n",count);	
 		return count;
 	}
 
 	/* count = +1 for each AI 3 in a row and -1 for each HUMAN 3 in a row */
-	private int count_3_in_a_row(Player p)
+	private int count_3_in_a_row (Player p)
 	{
 		int count = 0;
 
@@ -463,6 +493,9 @@ public class DecisionTree
 				if(board[i,j] != Player.NONE)
 					break;
 
+				if (all_adjacent_empty(i,j)) 
+					continue;
+
 				board[i,j] = p;
 
 				if(is_victor(j)!=0)
@@ -474,6 +507,47 @@ public class DecisionTree
 		}
 		last_move = old_last_move;
 		return count;
+	}
+
+	private bool all_adjacent_empty (int i, int j)
+	{
+		if (i > 0 && j > 0 && board[i-1,j-1]!=Player.NONE) 
+			return false;
+		if (i > 0  && board[i-1,j]!=Player.NONE) 
+			return false;
+		if (j > 0 && board[i,j-1]!=Player.NONE) 
+			return false;
+		if (i < (BOARD_ROWS - 1) && j > 0 && board[i+1,j-1]!=Player.NONE) 
+			return false;
+		if (i > 0 && j < (BOARD_COLUMNS -1) && board[i-1,j+1]!=Player.NONE) 
+			return false;
+		if (i < (BOARD_ROWS -1) && j < (BOARD_COLUMNS - 1) && board[i+1,j+1]!=Player.NONE) 
+			return false;
+		if (i < (BOARD_ROWS - 1)  && board[i+1,j]!=Player.NONE) 
+			return false;
+		if (j < (BOARD_COLUMNS - 1) && board[i,j+1]!=Player.NONE) 
+			return false;
+		return true;
+	}
+
+	private void set_level (string vstr)
+	{
+
+		if (vstr[0] == 'a')
+		{
+			level = Difficulty.EASY;
+			plies = 4;
+		}
+		else if (vstr[0] == 'b')
+		{
+			level = Difficulty.MEDIUM;
+			plies = 10;
+		}
+		else
+		{
+			level = Difficulty.HARD;
+			plies = 8;
+		}
 	}
 }
 
