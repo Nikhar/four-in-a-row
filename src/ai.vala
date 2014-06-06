@@ -1,15 +1,12 @@
-//#define needs valac -D?
-//TODO int.MIN gives error
-//TODO Correct names for following constants
-//Here NEG_INF is supposed to be the lowest possible number
-//Here POS_INF is supposed to be the heurist return value when AI wins
-//POS_INF < NEG_INF/plies
+/*Here NEG_INF is supposed to be the lowest possible int value. int.MIN
+MAX_HEURIST_VALUE is the maximum value that the heuristic functions can return.
+It is returned when AI wins. -1*MAX_HEURIST_VALUE is returned when Human wins
+MAX_HEURIST_VALUE < NEG_INF/plies*/
+//FIXME int.MIN gives error
 const int NEG_INF = -100000; 
-const int POS_INF = 10000;
-// TODO I don't think it's a 7*7 board, it seems more like 6 * 7 board
+const int MAX_HEURIST_VALUE = 10000;
 const int BOARD_ROWS = 6; 
 const int BOARD_COLUMNS = 7; 
-const bool DEBUG = false;
 enum Player { NONE, HUMAN, AI;}
 enum Difficulty {EASY, MEDIUM, HARD;}
 
@@ -17,12 +14,6 @@ int playgame (string fixme)
 {
 	var t = new DecisionTree();
 	return t.playgame (fixme);
-}
-
-void board_reset ()
-{
-//	DecisionTree.board_reset();
-//	DecisionTree.print_board();
 }
 
 public class DecisionTree
@@ -40,32 +31,13 @@ public class DecisionTree
 
 	public DecisionTree ()
 	{
-		//TODO: properly initialize on first construction
 		for (int i=0; i < BOARD_ROWS; i++)
 		{
 			for (int j=0; j < BOARD_COLUMNS; j++)
 			{
-				/* 0 implies the cell is empty
-				 -1 implies human has moved and 1 implies AI has moved
-				 this choice used because we wish to maximize AI's score*/
 				board[i,j]=Player.NONE;
 			}
 		}
-	}
-
-	public static void board_reset()
-	{
-		for (int i=0; i < BOARD_ROWS; i++)
-		{
-			for (int j=0; j < BOARD_COLUMNS; j++)
-			{
-				/* 0 implies the cell is empty
-				 -1 implies human has moved and 1 implies AI has moved
-				 this choice used because we wish to maximize AI's score*/
-		//		board[i,j] = Player.NONE;
-			}
-		}
-
 	}
 
 	/* utility function for debugging purposes*/
@@ -85,8 +57,6 @@ public class DecisionTree
 	private int negamax (int height, int alpha, int beta)
 	{
 
-		if (DEBUG) 
-			stdout.printf("The value of alpha, beta on entering height %d is %d,%d: \n",height,alpha,beta);
 		if (height==0 || board_full()) 
 		{
 			if (last_move == Player.HUMAN)
@@ -95,10 +65,9 @@ public class DecisionTree
 				return -1 * heurist();
 			else
 				return 0;
-			//return -1*last_move*heurist();
 		}
 
-		int max = NEG_INF; //TODO: replace NEG_INF by Vala equivalent of numeric_limits<int>::min
+		int max = NEG_INF; //TODO: int.MIN returns error
 
 		int next = -1;
 
@@ -120,7 +89,6 @@ public class DecisionTree
 					temp = -1 * is_victor(i) * height;
 				else
 					temp = is_victor(i) * height;
-//				int temp = last_move * is_victor(i) * height;
 
 				/* if making a move in this column resulted in a victory for someone, temp!=0, we do not need to go
 				   further down the negamax tree*/
@@ -139,17 +107,11 @@ public class DecisionTree
 				if (temp > alpha)
 				{
 					alpha = temp;
-					if (DEBUG) 
-						stdout.printf("The value of alpha at height %d changes to %d\n",height,alpha);
-					if (DEBUG) 
-						stdout.printf("The value of alpha, beta after change at height %d is %d,%d: \n",height,alpha,beta);
 				}
 
 
 				if (alpha >= beta)
 				{
-					if (DEBUG) 
-						stdout.printf("breaking\n");
 					break;
 				}
 
@@ -159,13 +121,11 @@ public class DecisionTree
 		if (height == plies) 
 			next_move = next;
 
-		if (DEBUG) 
-		stdout.printf("The value of alpha, beta on leaving height %d is %d,%d: \n",height,alpha,beta);
 
 		return max;
 	}
 
-	/* returns POS_INF if AI has won as a result of the last move made, NEG_INF if HUMAN has won, 0 if no one has won the game yet 
+	/* returns MAX_HEURIST_VALUE if AI has won as a result of the last move made, NEG_INF if HUMAN has won, 0 if no one has won the game yet 
 	   The argument i is the column in which the last move was made. */
 	private int is_victor (int i)
 	{
@@ -192,7 +152,7 @@ public class DecisionTree
 
 	}
 
-	/* all the win functions that follow return 0 is no one wins, POS_INF if AI wins, -1 * POS_INF if human wins */
+	/* all the win functions that follow return 0 is no one wins, MAX_HEURIST_VALUE if AI wins, -1 * MAX_HEURIST_VALUE if human wins */
 	private int forward_diagonal_win (int i, int j)
 	{
 		int count = 0;
@@ -203,10 +163,9 @@ public class DecisionTree
 		if (count >= 4)
 		{
 			if (last_move == Player.HUMAN)
-				return -1 * POS_INF;
+				return -1 * MAX_HEURIST_VALUE;
 			else
-				return POS_INF;
-//			return last_move * POS_INF;
+				return MAX_HEURIST_VALUE;
 		}
 
 		return 0;
@@ -222,10 +181,9 @@ public class DecisionTree
 		if (count >= 4)
 		{
 			if (last_move == Player.HUMAN)
-				return -1 * POS_INF;
+				return -1 * MAX_HEURIST_VALUE;
 			else
-				return POS_INF;
-		//	return last_move * POS_INF;
+				return MAX_HEURIST_VALUE;
 		}
 
 		return 0;
@@ -241,10 +199,9 @@ public class DecisionTree
 		if (count >= 4)
 		{
 			if (last_move == Player.HUMAN)
-				return -1 * POS_INF;
+				return -1 * MAX_HEURIST_VALUE;
 			else
-				return POS_INF;
-		//	return last_move * POS_INF;
+				return MAX_HEURIST_VALUE;
 		}
 
 		return 0;
@@ -259,10 +216,9 @@ public class DecisionTree
 		if (count >= 4) 
 		{
 			if (last_move == Player.HUMAN)
-				return -1 * POS_INF;
+				return -1 * MAX_HEURIST_VALUE;
 			else
-				return POS_INF;
-		//	return last_move * POS_INF;
+				return MAX_HEURIST_VALUE;
 		}
 
 		return 0;
@@ -270,7 +226,6 @@ public class DecisionTree
 
 	private bool board_full ()
 	{
-		//TODO Use a for loop that uses BOARD_COLUMNS 
 		bool empty = false;
 		for (int i = 0 ; i < BOARD_COLUMNS ; i++)
 		{
@@ -281,7 +236,6 @@ public class DecisionTree
 			}
 		}
 		return !empty;
-		//return board[0,0]!=0 && board[0,1]!=0 && board[0,2]!=0 && board[0,3]!=0 && board[0,4]!=0 && board[0,5]!=0 && board[0,6]!=0;
 	}
 
 	private bool move (int i)
@@ -305,8 +259,6 @@ public class DecisionTree
 			last_move = Player.HUMAN;
 		}
 
-	//	print_board();
-
 		return true;
 	}
 
@@ -318,10 +270,6 @@ public class DecisionTree
 
 		board[cell + 1,i] = Player.NONE;
 
-/*		int temp = -1 * last_move;
-
-		last_move = (Player)temp;*/
-
 		if (last_move == Player.AI)
 			last_move = Player.HUMAN;
 		else if (last_move == Player.HUMAN)
@@ -331,25 +279,9 @@ public class DecisionTree
 
 	public void update_board (string vstr)
 	{
-		/*second last letter tells the latest move of human 
-		 odd length => human first move*/
-		/*stdout.printf("%s\n",vstr);
 		next_move = -1;
 
-		if (vstr.length == 2) return; // AI will make the first move, nothing to add to the board
-
-		int cell;
-
-		int column = int.parse(vstr[vstr.length - 2].to_string()) -1;
-
-		for (cell = BOARD_ROWS - 1; cell >= 0 && board[cell,column] != 0; cell -= 1);
-
-		board[cell,column] = Player.HUMAN;
-
-		last_move = Player.HUMAN;*/
-
-		next_move = -1;
-
+		/* AI will make the first move, nothing to add to the board*/
 		if (vstr.length == 2) return; // AI will make the first move, nothing to add to the board
 
 		Player move;
@@ -376,7 +308,6 @@ public class DecisionTree
 		}
 
 		last_move = Player.HUMAN;
-		//print_board();
 	}
 
 	/* check for immediate win of AI/HUMAN */
@@ -428,9 +359,6 @@ public class DecisionTree
 
 		negamax(plies,  NEG_INF, -1 * NEG_INF);
 
-		move(next_move);
-
-		//old c code begins indexing from 1
 		return next_move + 1;
 
 	}
@@ -448,17 +376,17 @@ public class DecisionTree
 		
 	}
 
-	private int heurist_easy()
+	private int heurist_easy ()
 	{
 		return -1 * heurist_hard();
 	}
 
-	private int heurist_medium()
+	private int heurist_medium ()
 	{
 		return Random.int_range(1,49);
 	}
 
-	private int heurist_hard()
+	private int heurist_hard ()
 	{
 		int count = 0;
 
@@ -471,9 +399,6 @@ public class DecisionTree
 		if (count == 0)
 			count = Random.int_range(1,49);
 		
-		//stdout.printf("%d\n",count);	
-		if (DEBUG) 
-			stdout.printf("Heurist returns: %d\n",count);	
 		return count;
 	}
 
@@ -550,7 +475,7 @@ public class DecisionTree
 		}
 	}
 
-
+/* utility function for testing purposes*/
 	public int playandcheck (string vstr)
 	{
 		set_level(vstr);
@@ -571,9 +496,6 @@ public class DecisionTree
 
 		negamax(plies,  NEG_INF, -1 * NEG_INF);
 
-	//	move(next_move);
-
-		//old c code begins indexing from 1
 		return next_move + 1;
 
 	}
