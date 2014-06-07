@@ -101,14 +101,93 @@ private void test_random ()
 	int x = playgame ("a443256214350");
 	assert (x >= 1 && x <= 7);
 
-	x = playgame ("a24357315461711177416622623350");
+	x = playgame ("a241473564653551113366316150");
 	assert (x >= 1 && x <= 7);
 
-	x = playgame ("a241473564653551113366316150");
+	x = playgame ("a24357315461711177416622623350");
 	assert (x >= 1 && x <= 7);
 	
 	x = playgame ("a1445662644751711377553333665775446110");
 	assert (x >= 1 && x <= 7);
+}
+
+private int test_ai_vs_ai (string easier, string harder)
+{
+	int easy = 0;
+	int draw = 0;
+	int hard = 0;
+
+	for (int i = 0; i< 5;i++)
+	{
+		var e = new StringBuilder();
+		e.append(easier);
+
+		var m = new StringBuilder();
+		m.append(harder);
+
+		int count = 0;
+
+		while (true)
+		{
+			count++;
+			int move;
+			DecisionTree t = new DecisionTree();
+			move = t.playandcheck(e.str);
+			if (move == 0)
+			{
+				draw++;
+				break;
+			}
+
+			if (move == 1000)
+			{
+				easy++;
+				break;
+			}
+
+			e.insert(e.str.length - 1, move.to_string());
+			m.insert(m.str.length - 1, move.to_string());
+
+			DecisionTree d = new DecisionTree();
+			move = d.playandcheck(m.str);
+
+			if (move == 0)
+			{
+				draw++;
+				break;
+			}
+
+			if (move == 1000)
+			{
+				hard++;
+				break;
+			}
+			e.insert(e.str.length - 1, move.to_string());
+			m.insert(m.str.length - 1, move.to_string());
+		}
+	}
+	return easy;
+}
+
+private void test_easy_vs_medium ()
+{
+	int easy_wins = test_ai_vs_ai ("a0","b0");
+
+	assert (easy_wins < 3);
+}
+
+private void test_easy_vs_hard ()
+{
+	int easy_wins = test_ai_vs_ai ("a0","c0");
+
+	assert (easy_wins < 3);
+}
+
+private void test_medium_vs_hard ()
+{
+	int medium_wins = test_ai_vs_ai ("b0","c0");
+
+	assert (medium_wins < 3);
 }
 
 public int main (string[] args)
@@ -122,6 +201,9 @@ public int main (string[] args)
     Test.add_func ("/AI/Avoid Loss/Vertical Loss", test_avoid_vertical_loss);
     Test.add_func ("/AI/Avoid Loss/Forward Diagonal Loss", test_avoid_forward_diagonal_loss);
     Test.add_func ("/AI/Avoid Loss/Backward Diagonal Loss", test_avoid_backward_diagonal_loss);
+    Test.add_func ("/AI/AI vs AI/Easy vs Medium", test_easy_vs_medium);
+    Test.add_func ("/AI/AI vs AI/Easy vs Hard", test_easy_vs_hard);
+    Test.add_func ("/AI/AI vs AI/Medium vs Hard", test_medium_vs_hard);
     Test.add_func ("/AI/Draw", test_draw);
     Test.add_func ("/AI/Random", test_random);
     return Test.run ();
